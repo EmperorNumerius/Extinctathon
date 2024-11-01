@@ -232,22 +232,6 @@ function Game({ room, username }) {
                         <Box display="flex" justifyContent="center" alignItems="center">
                             <AnimalCard animal={currentAnimal} />
                         </Box>
-                        <Box flex={1} marginLeft="20px">
-                            <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
-                                <Typography variant="h5" gutterBottom>
-                                    Computer Guesses
-                                </Typography>
-                                {computerGuesses.map(({ guess, isCorrect }, index) => (
-                                    <Chip
-                                        key={index}
-                                        label={guess}
-                                        color={isCorrect ? 'primary' : 'error'}
-                                        variant="outlined"
-                                        style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                                    />
-                                ))}
-                            </Paper>
-                        </Box>
                         <TextField
                             label="Enter your guess"
                             variant="outlined"
@@ -267,11 +251,33 @@ function Game({ room, username }) {
                                 <Typography variant="h5" gutterBottom>
                                     Your Score: {score}
                                 </Typography>
+                                <Typography variant="h6" gutterBottom>
+                                    The animal was: {currentAnimal.name}
+                                </Typography>
+                                <Typography variant="h6" gutterBottom>
+                                    The computer's animal was: {computerAnimal.name}
+                                </Typography>
                                 <Button variant="contained" color="primary" onClick={restartGame} style={{ marginTop: '20px' }}>
                                     Restart Game
                                 </Button>
                             </div>
                         )}
+                    </Paper>
+                </Box>
+                <Box flex={1} marginLeft="20px">
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                        <Typography variant="h5" gutterBottom>
+                            Computer Guesses
+                        </Typography>
+                        {computerGuesses.map(({ guess, isCorrect }, index) => (
+                            <Chip
+                                key={index}
+                                label={guess}
+                                color={isCorrect ? 'primary' : 'error'}
+                                variant="outlined"
+                                style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                            />
+                        ))}
                     </Paper>
                 </Box>
             </Box>
