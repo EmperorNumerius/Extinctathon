@@ -231,22 +231,22 @@ function Game({ room, username }) {
                         </Typography>
                         <Box display="flex" justifyContent="center" alignItems="center">
                             <AnimalCard animal={currentAnimal} />
-                            <Box flex={1} marginLeft="20px">
-                                <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
-                                    <Typography variant="h5" gutterBottom>
-                                        Computer Guesses
-                                    </Typography>
-                                    {computerGuesses.map(({ guess, isCorrect }, index) => (
-                                        <Chip
-                                            key={index}
-                                            label={guess}
-                                            color={isCorrect ? 'primary' : 'error'}
-                                            variant="outlined"
-                                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                                        />
-                                    ))}
-                                </Paper>
-                            </Box>
+                        </Box>
+                        <Box flex={1} marginLeft="20px">
+                            <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                                <Typography variant="h5" gutterBottom>
+                                    Computer Guesses
+                                </Typography>
+                                {computerGuesses.map(({ guess, isCorrect }, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={guess}
+                                        color={isCorrect ? 'primary' : 'error'}
+                                        variant="outlined"
+                                        style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                                    />
+                                ))}
+                            </Paper>
                         </Box>
                         <TextField
                             label="Enter your guess"
