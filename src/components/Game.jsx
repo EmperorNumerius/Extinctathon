@@ -153,20 +153,27 @@ function Game({ room, username }) {
 
     const getHint = () => {
         if (hints > 0) {
-            const hint = getRandomHint(computerGuesses);
+            const hint = getRandomHint(computerAnimal);
             setHints(hints - 1);
             alert(`Hint: ${hint}`);
         }
     };
 
-    const getRandomHint = (computerGuesses) => {
-        if (computerGuesses.length === 0) {
-            return "No guesses from the computer yet.";
-        }
-        const lastGuess = computerGuesses[computerGuesses.length - 1];
-        return `The computer guessed: ${lastGuess.guess}`;
-    };
-
+    const getRandomHint = (animal) => {
+        const possibleHints = [
+            `Legs: ${animal.legs}`,
+            `Phylum: ${animal.phylum}`,
+            `Class: ${animal.class}`,
+            `Order: ${animal.order}`,
+            `Family: ${animal.family}`,
+            `Genus: ${animal.genus}`,
+            `Species: ${animal.species}`,
+            `Habitat: ${animal.habitat}`,
+            `Last Seen: ${animal.lastSeen}`,
+            `Cause of Extinction: ${animal.cause}`
+        ];
+    return possibleHints[Math.floor(Math.random() * possibleHints.length)];
+};
     const saveScore = async (score) => {
         try {
             await addDoc(collection(db, 'leaderboard'), {
@@ -194,9 +201,9 @@ function Game({ room, username }) {
 
     return (
         <Container maxWidth="lg" style={{ textAlign: 'center', marginTop: '50px' }}>
-            <Box display="flex" justifyContent="space-between">
+            <Box display="flex" justifyContent="center">
                 <Box flex={1} marginRight="20px">
-                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff'}}>
                         <Typography variant="h5" gutterBottom>
                             Your Guesses
                         </Typography>
@@ -211,8 +218,8 @@ function Game({ room, username }) {
                         ))}
                     </Paper>
                 </Box>
-                <Box flex={2} display="flex" flexDirection="column" alignItems="center">
-                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff', width: '100%' }}>
+                <Box flex={2} display="flex" flexDirection="center" alignItems="center">
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff', width: "100%" }}>
                         <Typography variant="h4" gutterBottom sx={{ textShadow: '2px 2px 4px #ff5722' }}>
                             {room}
                         </Typography>
