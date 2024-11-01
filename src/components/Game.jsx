@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Typography, Container, Paper, Button, Chip } from '@mui/material';
+import { TextField, Typography, Container, Paper, Button, Chip, Box } from '@mui/material';
 import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import AnimalCard from './AnimalCard';
@@ -136,9 +136,12 @@ function Game({ room, username }) {
     };
 
     const makeFinalGuess = (correctGuesses) => {
-        // Logic to make a final guess based on correct guesses
-        // For simplicity, we'll assume the name is guessed correctly if we have enough correct information
-        return currentAnimal.name; // Replace with actual guessing logic
+        const possibleAnimals = animals.filter(animal => {
+            return Object.keys(correctGuesses).every(key => {
+                return animal[key.toLowerCase()] === correctGuesses[key];
+            });
+        });
+        return possibleAnimals.length === 1 ? possibleAnimals[0].name : 'Unknown';
     };
 
     const calculateScore = (timeTaken, numGuesses) => {
@@ -175,68 +178,92 @@ function Game({ room, username }) {
         }
     };
 
+    const restartGame = () => {
+        setCurrentAnimal(animals[Math.floor(Math.random() * animals.length)]);
+        setGuesses([]);
+        setComputerGuesses([]);
+        setGameOver(false);
+        setStartTime(null);
+        setScore(0);
+        setCorrectGuesses({});
+        setTimeLeft(60);
+        setHints(3);
+    };
+
     return (
-        <Container maxWidth="sm" style={{ textAlign: 'center', marginTop: '50px' }}>
-            <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
-                <Typography variant="h4" gutterBottom sx={{ textShadow: '2px 2px 4px #ff5722' }}>
-                    {room}
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Time Left: {timeLeft} seconds
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    Hints: {hints}
-                </Typography>
-                <AnimalCard animal={currentAnimal} />
-                <TextField
-                    label="Enter your guess"
-                    variant="outlined"
-                    fullWidth
-                    onKeyPress={(e) => e.key === 'Enter' && handleGuess(e.target.value)}
-                    style={{ marginTop: '20px' }}
-                />
-                <Button variant="contained" color="secondary" onClick={getHint} style={{ marginTop: '20px' }}>
-                    Get Hint
-                </Button>
-                <div style={{ marginTop: '20px' }}>
-                    <Typography variant="h5" gutterBottom>
-                        Your Guesses
-                    </Typography>
-                    {guesses.map(({ guess, isCorrect }, index) => (
-                        <Chip
-                            key={index}
-                            label={guess}
-                            color={isCorrect ? 'primary' : 'error'}
-                            variant="outlined"
-                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                        />
-                    ))}
-                </div>
-                <div style={{ marginTop: '20px' }}>
-                    <Typography variant="h5" gutterBottom>
-                        Computer Guesses
-                    </Typography>
-                    {computerGuesses.map(({ guess, isCorrect }, index) => (
-                        <Chip
-                            key={index}
-                            label={guess}
-                            color={isCorrect ? 'primary' : 'error'}
-                            variant="outlined"
-                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                        />
-                    ))}
-                </div>
-                {gameOver && (
-                    <div style={{ marginTop: '20px' }}>
+        <Container maxWidth="lg" style={{ textAlign: 'center', marginTop: '50px' }}>
+            <Box display="flex" justifyContent="space-between">
+                <Box flex={1} marginRight="20px">
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
                         <Typography variant="h5" gutterBottom>
-                            {timeLeft === 0 ? 'Time is up!' : 'Congratulations! You guessed the animal correctly.'}
+                            Your Guesses
                         </Typography>
+                        {guesses.map(({ guess, isCorrect }, index) => (
+                            <Chip
+                                key={index}
+                                label={guess}
+                                color={isCorrect ? 'primary' : 'error'}
+                                variant="outlined"
+                                style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                            />
+                        ))}
+                    </Paper>
+                </Box>
+                <Box flex={2}>
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                        <Typography variant="h4" gutterBottom sx={{ textShadow: '2px 2px 4px #ff5722' }}>
+                            {room}
+                        </Typography>
+                        <Typography variant="h6" gutterBottom>
+                            Time Left: {timeLeft} seconds
+                        </Typography>
+                        <Typography variant="h6" gutterBottom>
+                            Hints: {hints}
+                        </Typography>
+                        <AnimalCard animal={currentAnimal} />
+                        <TextField
+                            label="Enter your guess"
+                            variant="outlined"
+                            fullWidth
+                            onKeyPress={(e) => e.key === 'Enter' && handleGuess(e.target.value)}
+                            style={{ marginTop: '20px' }}
+                            disabled={gameOver}
+                        />
+                        <Button variant="contained" color="secondary" onClick={getHint} style={{ marginTop: '20px' }} disabled={gameOver}>
+                            Get Hint
+                        </Button>
+                        {gameOver && (
+                            <div style={{ marginTop: '20px' }}>
+                                <Typography variant="h5" gutterBottom>
+                                    {timeLeft === 0 ? 'Time is up!' : 'Congratulations! You guessed the animal correctly.'}
+                                </Typography>
+                                <Typography variant="h5" gutterBottom>
+                                    Your Score: {score}
+                                </Typography>
+                                <Button variant="contained" color="primary" onClick={restartGame} style={{ marginTop: '20px' }}>
+                                    Restart Game
+                                </Button>
+                            </div>
+                        )}
+                    </Paper>
+                </Box>
+                <Box flex={1} marginLeft="20px">
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
                         <Typography variant="h5" gutterBottom>
-                            Your Score: {score}
+                            Computer Guesses
                         </Typography>
-                    </div>
-                )}
-            </Paper>
+                        {computerGuesses.map(({ guess, isCorrect }, index) => (
+                            <Chip
+                                key={index}
+                                label={guess}
+                                color={isCorrect ? 'primary' : 'error'}
+                                variant="outlined"
+                                style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                            />
+                        ))}
+                    </Paper>
+                </Box>
+            </Box>
             <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff', marginTop: '20px' }}>
                 <Typography variant="h4" gutterBottom>
                     Leaderboard
