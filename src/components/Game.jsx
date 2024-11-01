@@ -56,6 +56,7 @@ function Game({ room, username }) {
     const [correctGuesses, setCorrectGuesses] = useState({});
     const [timeLeft, setTimeLeft] = useState(60); // 60 seconds timer
     const [hints, setHints] = useState(3); // 3 hints available
+    const [leaderboard, setLeaderboard] = useState([]);
 
     useEffect(() => {
         if (!gameOver && timeLeft > 0) {
