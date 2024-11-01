@@ -231,21 +231,21 @@ function Game({ room, username }) {
                         </Typography>
                         <Box display="flex" justifyContent="center" alignItems="center">
                             <AnimalCard animal={currentAnimal} />
-                            <Box marginLeft="20px">
-                                <Typography variant="h5" gutterBottom>
-                                    Computer Guesses
-                                </Typography>
-                                {computerGuesses.map(({ guess, isCorrect }, index) => (
-                                    <Box key={index} display="flex" alignItems="center" style={{ margin: '5px' }}>
+                            <Box flex={1} marginLeft="20px">
+                                <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                                    <Typography variant="h5" gutterBottom>
+                                        Computer Guesses
+                                    </Typography>
+                                    {computerGuesses.map(({ guess, isCorrect }, index) => (
                                         <Chip
+                                            key={index}
                                             label={guess}
                                             color={isCorrect ? 'primary' : 'error'}
                                             variant="outlined"
-                                            style={{ borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
                                         />
-                                        {isCorrect && <CircularProgress size={20} style={{ color: 'green', marginLeft: '10px' }} />}
-                                    </Box>
-                                ))}
+                                    ))}
+                                </Paper>
                             </Box>
                         </Box>
                         <TextField
