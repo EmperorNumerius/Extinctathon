@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Typography, Container, Paper, Button, Chip } from '@mui/material';
-import { signInAnonymously } from 'firebase/auth';
 import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 import AnimalCard from './AnimalCard';
 
 const animals = [
@@ -47,7 +46,7 @@ const animals = [
     { name: 'Meganeura', legs: 6, phylum: 'Arthropoda', class: 'Insecta', order: 'Meganisoptera', family: 'Meganeuridae', genus: 'Meganeura', species: 'monyi', habitat: 'Europe', lastSeen: '300 million years ago', cause: 'Climate change and habitat destruction' },
 ];
 
-function Game({ room }) {
+function Game({ room, username }) {
     const [currentAnimal, setCurrentAnimal] = useState(animals[Math.floor(Math.random() * animals.length)]);
     const [guesses, setGuesses] = useState([]);
     const [computerGuesses, setComputerGuesses] = useState([]);
@@ -57,9 +56,6 @@ function Game({ room }) {
     const [correctGuesses, setCorrectGuesses] = useState({});
     const [timeLeft, setTimeLeft] = useState(60); // 60 seconds timer
     const [hints, setHints] = useState(3); // 3 hints available
-    const [username, setUsername] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [leaderboard, setLeaderboard] = useState([]);
 
     useEffect(() => {
         if (!gameOver && timeLeft > 0) {
@@ -166,28 +162,6 @@ function Game({ room }) {
         return `The computer guessed: ${lastGuess.guess}`;
     };
 
-    const handleLogin = () => {
-        if (username.trim()) {
-            signInAnonymously(auth)
-                .then(() => {
-                    setIsLoggedIn(true);
-                })
-                .catch((error) => {
-                    console.error('Error signing in anonymously:', error);
-                });
-        }
-    };
-
-    const handleAnonymousPlay = () => {
-        signInAnonymously(auth)
-            .then(() => {
-                setIsLoggedIn(true);
-            })
-            .catch((error) => {
-                console.error('Error signing in anonymously:', error);
-            });
-    };
-
     const saveScore = async (score) => {
         try {
             await addDoc(collection(db, 'leaderboard'), {
@@ -202,99 +176,76 @@ function Game({ room }) {
 
     return (
         <Container maxWidth="sm" style={{ textAlign: 'center', marginTop: '50px' }}>
-            {!isLoggedIn ? (
-                <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
-                    <Typography variant="h4" gutterBottom>
-                        Login
+            <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
+                <Typography variant="h4" gutterBottom sx={{ textShadow: '2px 2px 4px #ff5722' }}>
+                    {room}
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                    Time Left: {timeLeft} seconds
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                    Hints: {hints}
+                </Typography>
+                <AnimalCard animal={currentAnimal} />
+                <TextField
+                    label="Enter your guess"
+                    variant="outlined"
+                    fullWidth
+                    onKeyPress={(e) => e.key === 'Enter' && handleGuess(e.target.value)}
+                    style={{ marginTop: '20px' }}
+                />
+                <Button variant="contained" color="secondary" onClick={getHint} style={{ marginTop: '20px' }}>
+                    Get Hint
+                </Button>
+                <div style={{ marginTop: '20px' }}>
+                    <Typography variant="h5" gutterBottom>
+                        Your Guesses
                     </Typography>
-                    <TextField
-                        label="Enter your name"
-                        variant="outlined"
-                        fullWidth
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={{ marginTop: '20px' }}
-                    />
-                    <Button variant="contained" color="primary" onClick={handleLogin} style={{ marginTop: '20px' }}>
-                        Login
-                    </Button>
-                    <Button variant="contained" color="secondary" onClick={handleAnonymousPlay} style={{ marginTop: '20px' }}>
-                        Play Anonymously
-                    </Button>
-                </Paper>
-            ) : (
-                <>
-                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff' }}>
-                        <Typography variant="h4" gutterBottom sx={{ textShadow: '2px 2px 4px #ff5722' }}>
-                            {room}
-                        </Typography>
-                        <Typography variant="h6" gutterBottom>
-                            Time Left: {timeLeft} seconds
-                        </Typography>
-                        <Typography variant="h6" gutterBottom>
-                            Hints: {hints}
-                        </Typography>
-                        <AnimalCard animal={currentAnimal} />
-                        <TextField
-                            label="Enter your guess"
+                    {guesses.map(({ guess, isCorrect }, index) => (
+                        <Chip
+                            key={index}
+                            label={guess}
+                            color={isCorrect ? 'primary' : 'error'}
                             variant="outlined"
-                            fullWidth
-                            onKeyPress={(e) => e.key === 'Enter' && handleGuess(e.target.value)}
-                            style={{ marginTop: '20px' }}
+                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
                         />
-                        <Button variant="contained" color="secondary" onClick={getHint} style={{ marginTop: '20px' }}>
-                            Get Hint
-                        </Button>
-                        <div style={{ marginTop: '20px' }}>
-                            <Typography variant="h5" gutterBottom>
-                                Your Guesses
-                            </Typography>
-                            {guesses.map(({ guess, isCorrect }, index) => (
-                                <Chip
-                                    key={index}
-                                    label={guess}
-                                    color={isCorrect ? 'primary' : 'error'}
-                                    variant="outlined"
-                                    style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                                />
-                            ))}
-                        </div>
-                        <div style={{ marginTop: '20px' }}>
-                            <Typography variant="h5" gutterBottom>
-                                Computer Guesses
-                            </Typography>
-                            {computerGuesses.map(({ guess, isCorrect }, index) => (
-                                <Chip
-                                    key={index}
-                                    label={guess}
-                                    color={isCorrect ? 'primary' : 'error'}
-                                    variant="outlined"                                    style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
-                                />
-                            ))}
-                        </div>
-                        {gameOver && (
-                            <div style={{ marginTop: '20px' }}>
-                                <Typography variant="h5" gutterBottom>
-                                    {timeLeft === 0 ? 'Time is up!' : 'Congratulations! You guessed the animal correctly.'}
-                                </Typography>
-                                <Typography variant="h5" gutterBottom>
-                                    Your Score: {score}
-                                </Typography>
-                            </div>
-                        )}
-                    </Paper>
-                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff', marginTop: '20px' }}>
-                        <Typography variant="h4" gutterBottom>
-                            Leaderboard
+                    ))}
+                </div>
+                <div style={{ marginTop: '20px' }}>
+                    <Typography variant="h5" gutterBottom>
+                        Computer Guesses
+                    </Typography>
+                    {computerGuesses.map(({ guess, isCorrect }, index) => (
+                        <Chip
+                            key={index}
+                            label={guess}
+                            color={isCorrect ? 'primary' : 'error'}
+                            variant="outlined"
+                            style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                        />
+                    ))}
+                </div>
+                {gameOver && (
+                    <div style={{ marginTop: '20px' }}>
+                        <Typography variant="h5" gutterBottom>
+                            {timeLeft === 0 ? 'Time is up!' : 'Congratulations! You guessed the animal correctly.'}
                         </Typography>
-                        {leaderboard.map((entry, index) => (
-                            <Typography key={index} variant="h6">
-                                {index + 1}. {entry.username} - {entry.score}
-                            </Typography>
-                        ))}
-                    </Paper>
-                </>
-            )}
+                        <Typography variant="h5" gutterBottom>
+                            Your Score: {score}
+                        </Typography>
+                    </div>
+                )}
+            </Paper>
+            <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#1e1e1e', color: '#ffffff', marginTop: '20px' }}>
+                <Typography variant="h4" gutterBottom>
+                    Leaderboard
+                </Typography>
+                {leaderboard.map((entry, index) => (
+                    <Typography key={index} variant="h6">
+                        {index + 1}. {entry.username} - {entry.score}
+                    </Typography>
+                ))}
+            </Paper>
         </Container>
     );
 }
