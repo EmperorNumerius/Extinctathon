@@ -141,7 +141,7 @@ function Game({ room }) {
     const makeFinalGuess = (correctGuesses) => {
         // Logic to make a final guess based on correct guesses
         // For simplicity, we'll assume the name is guessed correctly if we have enough correct information
-        return currentAnimal.name;
+        return currentAnimal.name; // Replace with actual guessing logic
     };
 
     const calculateScore = (timeTaken, numGuesses) => {
@@ -178,10 +178,20 @@ function Game({ room }) {
         }
     };
 
+    const handleAnonymousPlay = () => {
+        signInAnonymously(auth)
+            .then(() => {
+                setIsLoggedIn(true);
+            })
+            .catch((error) => {
+                console.error('Error signing in anonymously:', error);
+            });
+    };
+
     const saveScore = async (score) => {
         try {
             await addDoc(collection(db, 'leaderboard'), {
-                username,
+                username: username || 'Anonymous',
                 score,
                 timestamp: new Date(),
             });
@@ -207,6 +217,9 @@ function Game({ room }) {
                     />
                     <Button variant="contained" color="primary" onClick={handleLogin} style={{ marginTop: '20px' }}>
                         Login
+                    </Button>
+                    <Button variant="contained" color="secondary" onClick={handleAnonymousPlay} style={{ marginTop: '20px' }}>
+                        Play Anonymously
                     </Button>
                 </Paper>
             ) : (
@@ -255,8 +268,7 @@ function Game({ room }) {
                                     key={index}
                                     label={guess}
                                     color={isCorrect ? 'primary' : 'error'}
-                                    variant="outlined"
-                                    style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
+                                    variant="outlined"                                    style={{ margin: '5px', borderColor: isCorrect ? '#bb86fc' : '#f44336' }}
                                 />
                             ))}
                         </div>
