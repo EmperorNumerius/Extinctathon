@@ -141,7 +141,7 @@ function Game({ room }) {
     const makeFinalGuess = (correctGuesses) => {
         // Logic to make a final guess based on correct guesses
         // For simplicity, we'll assume the name is guessed correctly if we have enough correct information
-        return currentAnimal.name; // Replace with actual guessing logic
+        return currentAnimal.name;
     };
 
     const calculateScore = (timeTaken, numGuesses) => {
