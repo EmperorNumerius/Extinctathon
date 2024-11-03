@@ -1,8 +1,1 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+EXTINCTATHON, Monitored by MaddAddam. Adam named the living animals, MaddAddam names the dead ones. Do you want to play? That was what came up when you logged on. You then had to click Yes, enter your codename, and pick one of the two chat rooms -- Kingdom Animal, Kingdom Vegetable. Then some challenger would come on-line.... and propose a contest. Begins with, number of legs, what is it? The it would be some bioform that had kakked out within the past fifty years - no T-Rex, no roc, no dodo, and points off for getting the time frame wrong. Then you'd narrow it down, Phylum Class Order Family Genus Species, then the habitat and when last seen, and what had snuffed it. (Pollution, habitat destruction, credulous morons who thought that eating its horn would give them a boner.) The longer the challenger held out, the more points he got, but you could win big bonuses for speed."
